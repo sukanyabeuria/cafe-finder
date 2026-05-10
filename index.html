@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Cafe Finder</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <!-- SEARCH BOX -->
+
+  <div class="search-box">
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search cafes..."
+    >
+
+    <button onclick="searchCafe()">
+      Search
+    </button>
+
+    <button id="darkBtn">
+      🌙
+    </button>
+
+  </div>
+
+  <!-- MAP -->
+
+  <div id="map"></div>
+
+  <!-- JAVASCRIPT -->
+
+  <script src="script.js"></script>
+
+  <!-- GOOGLE MAP API -->
+
+  <script
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+  </script>
+
+</body>
+
+</html>
