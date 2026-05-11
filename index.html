@@ -6,28 +6,37 @@
   <meta charset="UTF-8">
 
   <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
+  name="viewport"
+  content="width=device-width, initial-scale=1.0">
 
   <title>Cafe Finder</title>
-
-  <!-- LEAFLET -->
-
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-  <!-- CSS -->
-
-  <link
-    rel="stylesheet"
-    href="css/style.css">
 
   <!-- GOOGLE FONT -->
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
+  rel="preconnect"
+  href="https://fonts.googleapis.com">
+
+  <link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin>
+
+  <link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet">
+
+  <!-- LEAFLET CSS -->
+
+  <link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <!-- CSS -->
+
+  <link
+  rel="stylesheet"
+  href="css/style.css">
 
 </head>
 
@@ -37,39 +46,33 @@
 
   <div id="loader">
 
-    <div class="coffee-loader"></div>
-
-    <p>Finding aesthetic cafes...</p>
+    <div class="spinner"></div>
 
   </div>
 
   <!-- NAVBAR -->
 
-  <nav>
+  <nav class="navbar">
 
-    <h1>
+    <div class="logo">
 
-      <img
-        src="assets/icons/coffee.png"
-        width="30">
+      ☕ Cafe Finder
 
-      Cafe Finder
+    </div>
 
-    </h1>
-
-    <div class="nav-buttons">
-
-      <button id="darkBtn">
-
-        🌙
-
-      </button>
+    <div class="nav-right">
 
       <a href="favorites.html">
 
         ❤️ Favorites
 
       </a>
+
+      <button id="themeToggle">
+
+        🌙
+
+      </button>
 
     </div>
 
@@ -79,101 +82,347 @@
 
   <section class="hero">
 
-    <h2>
+    <h1>
 
-      Discover Aesthetic Cafes Near You
+      Discover Real Cafes Near You ☕
 
-    </h2>
+    </h1>
 
     <p>
 
-      Coffee • Reviews • Weather • Cozy Places
+      Real locations • Reviews • Directions • Weather
 
     </p>
+
+    <!-- SEARCH -->
+
+    <div class="search-box">
+
+      <input
+      type="text"
+      id="searchInput"
+      placeholder="Search cafe or city">
+
+      <button id="searchBtn">
+
+        Find Cafes
+
+      </button>
+
+    </div>
+
+    <!-- SUGGESTIONS -->
+
+    <div class="suggestions">
+
+      <span>Cafe Coffee Day</span>
+
+      <span>Bocca Cafe</span>
+
+      <span>Kruti Coffee</span>
+
+      <span>Mocha Cafe</span>
+
+    </div>
 
   </section>
 
-  <!-- SEARCH -->
+  <!-- MAP -->
 
-  <div class="search-box">
+  <section class="map-section">
 
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Search city or cafe">
+    <div id="map"></div>
 
-    <button onclick="searchLocation()">
-
-      Find Cafes
-
-    </button>
-
-  </div>
-
-  <!-- AI BOX -->
-
-  <div class="ai-box">
-
-    <h3>
-
-      🤖 AI Aesthetic Picks
-
-    </h3>
-
-    <p id="aiText">
-
-      Searching best aesthetic cafes...
-
-    </p>
-
-  </div>
+  </section>
 
   <!-- WEATHER -->
 
-  <div class="weather-box">
+  <section class="glass-section">
 
-    <h3>
+    <h2>
 
-      🌤 Weather
+      🌤 Current Weather
 
-    </h3>
+    </h2>
 
-    <p id="weatherText">
+    <div class="weather-content">
 
-      Loading weather...
+      <h3 id="weatherStatus">
 
-    </p>
+        Loading weather...
+
+      </h3>
+
+    </div>
+
+  </section>
+
+  <!-- REAL CAFE CARDS -->
+
+  <section class="cafes-section">
+
+    <h2 class="section-title">
+
+      Nearby Real Cafes ☕
+
+    </h2>
+
+    <div class="cards-grid">
+
+      <!-- CARD -->
+
+      <div class="modern-card">
+
+        <img
+        src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085">
+
+        <div class="card-content">
+
+          <div class="card-top">
+
+            <h3>
+
+              Cafe Coffee Day
+
+            </h3>
+
+            <span>
+
+              ⭐ 4.8
+
+            </span>
+
+          </div>
+
+          <p>
+
+            Cozy aesthetic cafe
+            with relaxing ambience.
+
+          </p>
+
+          <div class="card-bottom">
+
+            <span>
+
+              📍 2 km
+
+            </span>
+
+            <button class="fav-btn">
+
+              ❤️ Save
+
+            </button>
+
+          </div>
+
+          <a
+          class="direction-btn"
+          target="_blank"
+          href="https://maps.google.com">
+
+            Directions
+
+          </a>
+
+        </div>
+
+      </div>
+
+      <!-- CARD -->
+
+      <div class="modern-card">
+
+        <img
+        src="https://images.unsplash.com/photo-1509042239860-f550ce710b93">
+
+        <div class="card-content">
+
+          <div class="card-top">
+
+            <h3>
+
+              Bocca Cafe
+
+            </h3>
+
+            <span>
+
+              ⭐ 4.7
+
+            </span>
+
+          </div>
+
+          <p>
+
+            Soft pink interiors
+            and dreamy coffee vibes.
+
+          </p>
+
+          <div class="card-bottom">
+
+            <span>
+
+              📍 1.5 km
+
+            </span>
+
+            <button class="fav-btn">
+
+              ❤️ Save
+
+            </button>
+
+          </div>
+
+          <a
+          class="direction-btn"
+          target="_blank"
+          href="https://maps.google.com">
+
+            Directions
+
+          </a>
+
+        </div>
+
+      </div>
+
+      <!-- CARD -->
+
+      <div class="modern-card">
+
+        <img
+        src="https://images.unsplash.com/photo-1511920170033-f8396924c348">
+
+        <div class="card-content">
+
+          <div class="card-top">
+
+            <h3>
+
+              Kruti Coffee
+
+            </h3>
+
+            <span>
+
+              ⭐ 4.9
+
+            </span>
+
+          </div>
+
+          <p>
+
+            Modern cafe with
+            cozy aesthetic atmosphere.
+
+          </p>
+
+          <div class="card-bottom">
+
+            <span>
+
+              📍 3 km
+
+            </span>
+
+            <button class="fav-btn">
+
+              ❤️ Save
+
+            </button>
+
+          </div>
+
+          <a
+          class="direction-btn"
+          target="_blank"
+          href="https://maps.google.com">
+
+            Directions
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- REVIEWS -->
+
+  <section class="glass-section">
+
+    <h2>
+
+      💬 Reviews
+
+    </h2>
+
+    <div class="reviews-slider">
+
+      <div class="review-card">
+
+        “Best cafe finder UI ever 💜”
+
+      </div>
+
+      <div class="review-card">
+
+        “Real cafe locations work perfectly ☕”
+
+      </div>
+
+      <div class="review-card">
+
+        “Love the glowing purple aesthetic ✨”
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- MOBILE NAV -->
+
+  <div class="mobile-nav">
+
+    <a href="#">🏠</a>
+
+    <a href="#">🔍</a>
+
+    <a href="#">❤️</a>
+
+    <a href="#">👤</a>
 
   </div>
 
-  <!-- MAP -->
-
-  <div id="map"></div>
-
-  <!-- FLOATING BUTTON -->
+  <!-- TOP BUTTON -->
 
   <button id="topBtn">
 
-    ⬆
+    ↑
 
   </button>
 
-  <!-- FOOTER -->
+  <!-- LEAFLET JS -->
 
-  <footer>
-
-    Made with ❤️ by Sukanya Beuria
-
-  </footer>
-
-  <!-- LEAFLET -->
-
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script
+  src="https://unpkg.com/leaflet/dist/leaflet.js">
+  </script>
 
   <!-- JS -->
 
-  <script src="js/script.js"></script>
+  <script
+  src="js/script.js">
+  </script>
 
 </body>
-
 </html>
