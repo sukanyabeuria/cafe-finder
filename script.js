@@ -1,215 +1,370 @@
+// =========================
+// CAFE FINDER APP
+// =========================
+
+// MAP VARIABLES
+
 let map;
+let userMarker;
+let cafeMarkers = [];
 
-let service;
+// CREATE MAP
 
-let infowindow;
+map = L.map("map").setView([20.2961, 85.8245], 13);
 
-let userLat;
+// MAP TILE
 
-let userLng;
+L.tileLayer(
 
-let markers = [];
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 
+  {
+    attribution: "© OpenStreetMap"
+  }
+
+).addTo(map);
+
+// =========================
 // DARK MODE
+// =========================
 
 const darkBtn =
 document.getElementById("darkBtn");
 
-darkBtn.addEventListener("click", () => {
+if(darkBtn){
 
-  document.body.classList.toggle("dark");
+  darkBtn.addEventListener("click", () => {
+
+    document.body.classList.toggle("dark");
+
+    // SAVE MODE
+
+    if(document.body.classList.contains("dark")){
+
+      localStorage.setItem(
+        "theme",
+        "dark"
+      );
+
+    }
+
+    else{
+
+      localStorage.setItem(
+        "theme",
+        "light"
+      );
+
+    }
+
+  });
+
+}
+
+// LOAD SAVED THEME
+
+if(localStorage.getItem("theme") === "dark"){
+
+  document.body.classList.add("dark");
+
+}
+
+// =========================
+// LOADER
+// =========================
+
+window.addEventListener("load", () => {
+
+  setTimeout(() => {
+
+    const loader =
+    document.getElementById("loader");
+
+    if(loader){
+
+      loader.style.display = "none";
+
+    }
+
+  }, 1800);
 
 });
 
-// INITIALIZE MAP
+// =========================
+// USER LOCATION
+// =========================
 
-function initMap(lat, lng){
+navigator.geolocation.watchPosition(
 
-  userLat = lat;
+  (position) => {
 
-  userLng = lng;
+    const lat =
+    position.coords.latitude;
 
-  const location =
-  new google.maps.LatLng(lat, lng);
+    const lng =
+    position.coords.longitude;
 
-  map = new google.maps.Map(
+    // MOVE MAP
 
-    document.getElementById("map"),
+    map.flyTo([lat, lng], 15, {
 
-    {
-      center:location,
-      zoom:15,
-    }
+      duration: 2
 
-  );
+    });
 
-  // USER LOCATION MARKER
+    // USER MARKER
 
-  new google.maps.Marker({
+    if(userMarker){
 
-    position:location,
-
-    map:map,
-
-    title:"Your Location",
-
-    icon:
-    "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-
-  });
-
-  infowindow =
-  new google.maps.InfoWindow();
-
-  const request = {
-
-    location:location,
-
-    radius:3000,
-
-    type:["cafe"]
-
-  };
-
-  service =
-  new google.maps.places.PlacesService(map);
-
-  service.nearbySearch(request, callback);
-
-}
-
-// CALLBACK FUNCTION
-
-function callback(results, status){
-
-  if(
-    status ===
-    google.maps.places.PlacesServiceStatus.OK
-  ){
-
-    clearMarkers();
-
-    for(let i=0; i<results.length; i++){
-
-      createMarker(results[i]);
+      userMarker.setLatLng([lat, lng]);
 
     }
 
+    else{
+
+      userMarker =
+
+      L.marker([lat, lng])
+
+      .addTo(map)
+
+      .bindPopup("📍 You are here")
+
+      .openPopup();
+
+    }
+
+    // FETCH CAFES
+
+    fetchCafes(lat, lng);
+
+    // WEATHER
+
+    updateWeather();
+
+  },
+
+  () => {
+
+    alert("Location access denied");
+
   }
 
-}
+);
 
-// CREATE MARKER
+// =========================
+// FETCH CAFES
+// =========================
 
-function createMarker(place){
+async function fetchCafes(lat, lng){
 
-  let photoUrl =
-  "https://via.placeholder.com/250";
+  // REMOVE OLD MARKERS
 
-  if(place.photos){
+  cafeMarkers.forEach(marker => {
 
-    photoUrl =
-    place.photos[0].getUrl();
-
-  }
-
-  const marker =
-  new google.maps.Marker({
-
-    map:map,
-
-    position:place.geometry.location,
-
-    animation:google.maps.Animation.DROP
+    map.removeLayer(marker);
 
   });
 
-  markers.push(marker);
+  cafeMarkers = [];
 
-  const distance =
-  calculateDistance(
+  // OVERPASS API QUERY
 
-    userLat,
-    userLng,
+  const query = `
 
-    place.geometry.location.lat(),
+  [out:json];
 
-    place.geometry.location.lng()
+  (
+
+    node
+    ["amenity"="cafe"]
+
+    (around:3500,${lat},${lng});
 
   );
 
-  google.maps.event.addListener(
+  out;
 
-    marker,
+  `;
 
-    "click",
+  const url =
 
-    () => {
+  "https://overpass-api.de/api/interpreter?data="
 
-      infowindow.setContent(`
+  + encodeURIComponent(query);
 
-        <div class="info-card">
+  const response =
+  await fetch(url);
 
-          <img src="${photoUrl}">
+  const data =
+  await response.json();
 
-          <h2>${place.name}</h2>
+  // AI RECOMMENDATIONS
 
-          <p>
-          ⭐ Rating:
-          ${place.rating || "No rating"}
-          </p>
+  generateAestheticRecommendation(
+    data.elements
+  );
 
-          <p>
+  // LOOP CAFES
+
+  data.elements.forEach(cafe => {
+
+    const cafeName =
+
+    cafe.tags.name || "Cafe";
+
+    const distance =
+
+    calculateDistance(
+
+      lat,
+      lng,
+
+      cafe.lat,
+      cafe.lon
+
+    );
+
+    // RANDOM RATING
+
+    const rating =
+
+    (Math.random() * 2 + 3).toFixed(1);
+
+    // RANDOM REVIEW
+
+    const reviews = [
+
+      "✨ Cozy aesthetic vibes",
+
+      "☕ Amazing coffee",
+
+      "📸 Instagram worthy cafe",
+
+      "🎵 Chill ambience",
+
+      "💻 Perfect work cafe"
+
+    ];
+
+    const randomReview =
+
+    reviews[
+      Math.floor(
+        Math.random() * reviews.length
+      )
+    ];
+
+    // MARKER
+
+    const marker =
+
+    L.marker([cafe.lat, cafe.lon])
+
+    .addTo(map)
+
+    .bindPopup(`
+
+      <div style="
+      font-family:Poppins;
+      width:220px;
+      ">
+
+        <img
+
+        src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=800"
+
+        style="
+        width:100%;
+        border-radius:15px;
+        margin-bottom:10px;
+        ">
+
+        <h3>
+
+          ${cafeName}
+
+        </h3>
+
+        <p>
+
+          ⭐ ${rating}
+
+        </p>
+
+        <p>
+
           📍 ${distance} km away
-          </p>
 
-          <p>
-          ${place.vicinity || ""}
-          </p>
+        </p>
 
-          <a
-          target="_blank"
+        <p>
 
-          href="
-          https://www.google.com/maps/dir/?api=1&destination=
+          ${randomReview}
 
-          ${place.geometry.location.lat()},
-          ${place.geometry.location.lng()}
-          ">
+        </p>
 
-          🚗 Directions
+        <button
 
-          </a>
+        onclick="saveFavorite('${cafeName}')"
 
-          <br>
+        style="
 
-          <button
+        margin-top:10px;
 
-          class="favorite-btn"
+        padding:10px;
 
-          onclick="saveFavorite('${place.name}')"
+        border:none;
 
-          >
+        border-radius:10px;
 
-          ❤️ Favorite
+        cursor:pointer;
 
-          </button>
+        color:white;
 
-        </div>
+        background:
+        linear-gradient(
+        135deg,
+        #9c27b0,
+        #ff4fd8
+        );
 
-      `);
+        ">
 
-      infowindow.open(map, marker);
+        ❤️ Save Cafe
 
-    }
+        </button>
 
-  );
+        <br><br>
+
+        <a
+        href="cafe.html"
+
+        style="
+        text-decoration:none;
+        color:#9c27b0;
+        font-weight:600;
+        ">
+
+        View Details →
+
+        </a>
+
+      </div>
+
+    `);
+
+    cafeMarkers.push(marker);
+
+  });
 
 }
 
-// SEARCH CAFE
+// =========================
+// SEARCH LOCATION
+// =========================
 
-function searchCafe(){
+async function searchLocation(){
 
   const input =
 
@@ -217,110 +372,51 @@ function searchCafe(){
     "searchInput"
   ).value;
 
-  const request = {
+  if(input.trim() === ""){
 
-    query:input,
+    alert("Enter a location");
 
-    fields:["name","geometry"]
-
-  };
-
-  service.textSearch(
-
-    request,
-
-    (results, status) => {
-
-      if(
-
-        status ===
-        google.maps.places.PlacesServiceStatus.OK
-
-      ){
-
-        clearMarkers();
-
-        map.setCenter(
-          results[0].geometry.location
-        );
-
-        for(let i=0; i<results.length; i++){
-
-          createMarker(results[i]);
-
-        }
-
-      }
-
-    }
-
-  );
-
-}
-
-// CLEAR MARKERS
-
-function clearMarkers(){
-
-  for(let i=0; i<markers.length; i++){
-
-    markers[i].setMap(null);
+    return;
 
   }
 
-  markers = [];
+  const response =
+  await fetch(
+
+  `https://nominatim.openstreetmap.org/search?format=json&q=${input}`
+
+  );
+
+  const data =
+  await response.json();
+
+  if(data.length > 0){
+
+    const lat = data[0].lat;
+
+    const lon = data[0].lon;
+
+    map.flyTo([lat, lon], 15, {
+
+      duration: 2
+
+    });
+
+    fetchCafes(lat, lon);
+
+  }
+
+  else{
+
+    alert("Location not found");
+
+  }
 
 }
 
-// DISTANCE CALCULATION
-
-function calculateDistance(
-
-  lat1,
-  lon1,
-
-  lat2,
-  lon2
-
-){
-
-  const R = 6371;
-
-  const dLat =
-  (lat2-lat1) * Math.PI/180;
-
-  const dLon =
-  (lon2-lon1) * Math.PI/180;
-
-  const a =
-
-    Math.sin(dLat/2) *
-    Math.sin(dLat/2)
-
-    +
-
-    Math.cos(lat1*Math.PI/180) *
-
-    Math.cos(lat2*Math.PI/180) *
-
-    Math.sin(dLon/2) *
-
-    Math.sin(dLon/2);
-
-  const c =
-
-    2 *
-
-    Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1-a)
-    );
-
-  return (R*c).toFixed(2);
-
-}
-
-// SAVE FAVORITES
+// =========================
+// FAVORITES
+// =========================
 
 function saveFavorite(name){
 
@@ -342,38 +438,260 @@ function saveFavorite(name){
 
     );
 
-    alert("Cafe Saved ❤️");
+    alert("❤️ Cafe Saved");
 
   }
 
   else{
 
-    alert("Already Saved");
+    alert("Already saved");
 
   }
 
 }
 
-// LIVE LOCATION TRACKING
+// =========================
+// SHOW FAVORITES
+// =========================
 
-navigator.geolocation.watchPosition(
+const favoritesList =
 
-  (position) => {
+document.getElementById(
+  "favoritesList"
+);
 
-    const lat =
-    position.coords.latitude;
+if(favoritesList){
 
-    const lng =
-    position.coords.longitude;
+  const favorites =
 
-    initMap(lat, lng);
+  JSON.parse(
+    localStorage.getItem("cafes")
+  ) || [];
 
-  },
+  if(favorites.length === 0){
 
-  () => {
+    favoritesList.innerHTML =
 
-    alert("Location access denied");
+    "<p>No cafes saved yet ❤️</p>";
 
   }
 
-);
+  else{
+
+    favorites.forEach(cafe => {
+
+      favoritesList.innerHTML += `
+
+      <li>
+
+        ☕ ${cafe}
+
+      </li>
+
+      `;
+
+    });
+
+  }
+
+}
+
+// =========================
+// DISTANCE CALCULATOR
+// =========================
+
+function calculateDistance(
+
+  lat1,
+  lon1,
+
+  lat2,
+  lon2
+
+){
+
+  const R = 6371;
+
+  const dLat =
+
+  (lat2 - lat1) * Math.PI / 180;
+
+  const dLon =
+
+  (lon2 - lon1) * Math.PI / 180;
+
+  const a =
+
+    Math.sin(dLat/2) *
+    Math.sin(dLat/2)
+
+    +
+
+    Math.cos(lat1*Math.PI/180) *
+
+    Math.cos(lat2*Math.PI/180) *
+
+    Math.sin(dLon/2) *
+
+    Math.sin(dLon/2);
+
+  const c =
+
+  2 * Math.atan2(
+
+    Math.sqrt(a),
+
+    Math.sqrt(1-a)
+
+  );
+
+  return (R * c).toFixed(2);
+
+}
+
+// =========================
+// WEATHER
+// =========================
+
+function updateWeather(){
+
+  const weatherText =
+
+  document.getElementById(
+    "weatherText"
+  );
+
+  if(weatherText){
+
+    const weatherList = [
+
+      "☀ Pleasant weather",
+      "🌤 Perfect cafe weather",
+      "🌧 Rainy coffee vibes",
+      "☁ Cozy cloudy weather"
+
+    ];
+
+    weatherText.innerHTML =
+
+    weatherList[
+      Math.floor(
+        Math.random() * weatherList.length
+      )
+    ];
+
+  }
+
+}
+
+// =========================
+// AI AESTHETIC RECOMMENDATION
+// =========================
+
+function generateAestheticRecommendation(cafes){
+
+  const aestheticKeywords = [
+
+    "coffee",
+    "roastery",
+    "brew",
+    "espresso",
+    "artisan",
+    "garden",
+    "bakery",
+    "lounge",
+    "cafe"
+
+  ];
+
+  let aestheticCafes =
+
+  cafes.filter(cafe => {
+
+    const name =
+
+    (cafe.tags.name || "")
+    .toLowerCase();
+
+    return aestheticKeywords.some(keyword =>
+
+      name.includes(keyword)
+
+    );
+
+  });
+
+  // RANDOMIZE
+
+  aestheticCafes =
+
+  aestheticCafes.sort(
+    () => 0.5 - Math.random()
+  );
+
+  // TOP 3
+
+  const topCafes =
+
+  aestheticCafes.slice(0,3);
+
+  const aiText =
+
+  document.getElementById(
+    "aiText"
+  );
+
+  if(aiText){
+
+    if(topCafes.length > 0){
+
+      aiText.innerHTML = `
+
+      ✨ Recommended Aesthetic Cafes
+
+      <br><br>
+
+      ${topCafes.map(cafe =>
+
+        `☕ ${cafe.tags.name || "Cafe"}`
+
+      ).join("<br>")}
+
+      `;
+
+    }
+
+    else{
+
+      aiText.innerHTML =
+
+      "☕ No aesthetic cafes nearby";
+
+    }
+
+  }
+
+}
+
+// =========================
+// TOP BUTTON
+// =========================
+
+const topBtn =
+document.getElementById("topBtn");
+
+if(topBtn){
+
+  topBtn.addEventListener("click", () => {
+
+    window.scrollTo({
+
+      top:0,
+
+      behavior:"smooth"
+
+    });
+
+  });
+
+}

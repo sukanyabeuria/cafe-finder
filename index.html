@@ -4,33 +4,145 @@
 <head>
 
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
   <title>Cafe Finder</title>
 
-  <link rel="stylesheet" href="style.css">
+  <!-- LEAFLET -->
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- CSS -->
+
+  <link
+    rel="stylesheet"
+    href="css/style.css">
+
+  <!-- GOOGLE FONT -->
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
 
 </head>
 
 <body>
 
-  <!-- SEARCH BOX -->
+  <!-- LOADER -->
+
+  <div id="loader">
+
+    <div class="coffee-loader"></div>
+
+    <p>Finding aesthetic cafes...</p>
+
+  </div>
+
+  <!-- NAVBAR -->
+
+  <nav>
+
+    <h1>
+
+      <img
+        src="assets/icons/coffee.png"
+        width="30">
+
+      Cafe Finder
+
+    </h1>
+
+    <div class="nav-buttons">
+
+      <button id="darkBtn">
+
+        🌙
+
+      </button>
+
+      <a href="favorites.html">
+
+        ❤️ Favorites
+
+      </a>
+
+    </div>
+
+  </nav>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <h2>
+
+      Discover Aesthetic Cafes Near You
+
+    </h2>
+
+    <p>
+
+      Coffee • Reviews • Weather • Cozy Places
+
+    </p>
+
+  </section>
+
+  <!-- SEARCH -->
 
   <div class="search-box">
 
     <input
       type="text"
       id="searchInput"
-      placeholder="Search cafes..."
-    >
+      placeholder="Search city or cafe">
 
-    <button onclick="searchCafe()">
-      Search
+    <button onclick="searchLocation()">
+
+      Find Cafes
+
     </button>
 
-    <button id="darkBtn">
-      🌙
-    </button>
+  </div>
+
+  <!-- AI BOX -->
+
+  <div class="ai-box">
+
+    <h3>
+
+      🤖 AI Aesthetic Picks
+
+    </h3>
+
+    <p id="aiText">
+
+      Searching best aesthetic cafes...
+
+    </p>
+
+  </div>
+
+  <!-- WEATHER -->
+
+  <div class="weather-box">
+
+    <h3>
+
+      🌤 Weather
+
+    </h3>
+
+    <p id="weatherText">
+
+      Loading weather...
+
+    </p>
 
   </div>
 
@@ -38,15 +150,29 @@
 
   <div id="map"></div>
 
-  <!-- JAVASCRIPT -->
+  <!-- FLOATING BUTTON -->
 
-  <script src="script.js"></script>
+  <button id="topBtn">
 
-  <!-- GOOGLE MAP API -->
+    ⬆
 
-  <script
-  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
-  </script>
+  </button>
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    Made with ❤️ by Sukanya Beuria
+
+  </footer>
+
+  <!-- LEAFLET -->
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- JS -->
+
+  <script src="js/script.js"></script>
 
 </body>
 
